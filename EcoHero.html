@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EcoHero — Pastel Edition</title>
+  <meta name="description" content="EcoHero — gamified sustainability challenges (pastel theme)" />
+  <style>
+    /* Pastel theme variables */
+    :root{
+      --bg: #fffaf3; /* soft cream */
+      --card: #ffffff;
+      --muted: #7a7a7a;
+      --pastel-blue: #c9f0ff;
+      --pastel-green: #dff7e1;
+      --pastel-peach: #ffead6;
+      --pastel-lav: #f3e8ff;
+      --accent: #4b6b6f;
+      --success: #2e8b57;
+      --radius: 12px;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;background:linear-gradient(180deg,var(--bg),#ffffff);color:var(--accent);
+      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;padding-bottom:60px;
+    }
+
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:transparent}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--pastel-green),var(--pastel-blue));display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);box-shadow:0 8px 18px rgba(74,90,92,0.06)}
+    .title{font-size:18px;font-weight:800}
+    .tag{font-size:12px;color:var(--muted)}
+
+    button{padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:var(--card);cursor:pointer}
+    button.primary{background:linear-gradient(90deg,var(--pastel-blue),var(--pastel-peach));border:none;font-weight:700}
+
+    main{max-width:1100px;margin:18px auto;padding:16px;display:grid;grid-template-columns:1fr 340px;gap:18px}
+    .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 8px 24px rgba(27,31,32,0.04);border:1px solid rgba(0,0,0,0.03)}
+
+    .challenges{display:grid;gap:12px;margin-top:12px}
+    .challenge{display:flex;align-items:center;gap:12px}
+    .checkbox{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px dashed rgba(0,0,0,0.06);font-size:18px}
+    .meta h4{margin:0;font-size:15px}
+    .meta p{margin:6px 0 0 0;color:var(--muted);font-size:13px}
+    .points{font-weight:800;color:var(--success)}
+
+    form.add{display:flex;flex-direction:column;gap:8px}
+    input,textarea,select{padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);font-size:14px}
+
+    aside{position:sticky;top:84px}
+    .badges{display:flex;gap:8px;flex-wrap:wrap}
+    .badge{padding:8px;border-radius:10px;background:linear-gradient(90deg,var(--pastel-lav),var(--pastel-peach));font-weight:700}
+
+    .small{font-size:13px;color:var(--muted)}
+
+    @media (max-width:920px){main{grid-template-columns:1fr;padding:12px}aside{position:relative;top:0}}
+
+    footer{text-align:center;padding:18px;color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">EH</div>
+      <div>
+        <div class="title">EcoHero</div>
+        <div class="tag">Small actions. Big impact.</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <input id="username" placeholder="Your name" style="padding:8px;border-radius:10px;border:1px solid rgba(0,0,0,0.06)" />
+      <button id="saveName">Save</button>
+      <button id="openReport">Report</button>
+      <button id="openLeaderboard" class="primary">Leaderboard</button>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <h3 style="margin:0">Today's Challenges</h3>
+            <div class="small">Complete simple eco-tasks & earn points</div>
+          </div>
+          <div style="font-weight:800">Points: <span id="pointsTotal">0</span></div>
+        </div>
+      </div>
+
+      <div id="challengesList" class="challenges"></div>
+
+      <div class="card" style="margin-top:12px">
+        <h4 style="margin:0 0 8px 0">Create a custom challenge</h4>
+        <form id="addForm" class="add" onsubmit="return false;">
+          <input id="cTitle" placeholder="Title (e.g. Swap to LED bulbs)" required />
+          <textarea id="cDesc" rows="2" placeholder="Short description (optional)"></textarea>
+          <div style="display:flex;gap:8px">
+            <select id="cPoints">
+              <option value="5">5 pts</option>
+              <option value="10">10 pts</option>
+              <option value="20">20 pts</option>
+            </select>
+            <button id="addBtn" class="primary">Add</button>
+            <button id="resetBtn">Reset data</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h4 style="margin:0 0 8px 0">Tips & Resources</h4>
+        <ul id="tipsList" style="margin:0 0 0 18px;padding:0;color:var(--muted)"></ul>
+      </div>
+    </section>
+
+    <aside>
+      <div class="card">
+        <div class="small">Profile</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+          <div>
+            <div id="displayName" style="font-weight:800">Guest</div>
+            <div class="small" id="memberSince">Member</div>
+          </div>
+          <div style="text-align:right">
+            <div class="small">Level</div>
+            <div id="level" style="font-weight:800">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="small">Achievements</div>
+        <div class="badges" id="badgesArea" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="small">Leaderboard</div>
+        <div id="leaderboardPreview" style="margin-top:10px"></div>
+        <div style="margin-top:8px"><button id="viewAllLB">View leaderboard</button></div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="small">Share</div>
+        <div style="margin-top:8px"><button id="shareBtn">Share achievement</button></div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>EcoHero — pastel theme • Built for learning & demo</footer>
+
+  <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);align-items:center;justify-content:center;padding:20px">
+    <div style="background:var(--card);border-radius:12px;max-width:900px;width:100%;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div id="modalTitle" style="font-weight:800"></div>
+        <button id="closeModal">Close</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    const SAMPLE = {
+      username: 'Guest',
+      createdAt: new Date().toISOString(),
+      points: 0,
+      badges: [],
+      challenges: [
+        { id: 'c1', title: 'Shorter showers', desc: 'Limit shower to 5 minutes', points: 10, completed: false },
+        { id: 'c2', title: 'Recycle plastics', desc: 'Collect and recycle 5 plastic items', points: 10, completed: false },
+        { id: 'c3', title: 'Public transport', desc: 'Use bus or metro today', points: 15, completed: false },
+      ],
+      leaderboard: [ { name: 'Asha', points: 180 }, { name: 'Ravi', points: 150 }, { name: 'Priya', points: 120 } ],
+      tips: [ 'Use a reusable bottle', 'Unplug chargers when not in use', 'Compost kitchen scraps', 'Grow a small herb pot' ]
+    }
+
+    const STORAGE_KEY = 'ecohero-data-pastel'
+    let state = loadState()
+
+    function loadState(){
+      try{const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return structuredClone(SAMPLE); const o = JSON.parse(raw); o.challenges = o.challenges||SAMPLE.challenges; o.tips = o.tips||SAMPLE.tips; return o}catch(e){return structuredClone(SAMPLE)}
+    }
+    function saveState(){localStorage.setItem(STORAGE_KEY, JSON.stringify(state))}
+
+    const challengesList = document.getElementById('challengesList')
+    const pointsTotal = document.getElementById('pointsTotal')
+    const badgesArea = document.getElementById('badgesArea')
+    const leaderboardPreview = document.getElementById('leaderboardPreview')
+    const tipsList = document.getElementById('tipsList')
+
+    function render(){renderChallenges(); renderStats(); renderLeaderboardPreview(); renderTips(); document.getElementById('displayName').textContent = state.username || 'Guest'; document.getElementById('username').value = state.username || ''; pointsTotal.textContent = state.points; saveState()}
+
+    function renderChallenges(){challengesList.innerHTML=''; state.challenges.forEach(ch=>{const el=document.createElement('div');el.className='card';el.innerHTML=`<div class="challenge"><div class="checkbox">${ch.completed?'✅':''}</div><div class="meta"><h4>${escapeHtml(ch.title)}</h4><p>${escapeHtml(ch.desc||'')}</p></div><div style="text-align:right"><div class="points">${ch.points} pts</div><div style="margin-top:8px"><button data-id="${ch.id}" class="completeBtn">${ch.completed?'Undo':'Complete'}</button></div></div></div>`;challengesList.appendChild(el)})
+      document.querySelectorAll('.completeBtn').forEach(btn=>btn.onclick=()=>toggleComplete(btn.dataset.id))}
+
+    function renderStats(){badgesArea.innerHTML=''; if(state.badges.length===0) badgesArea.innerHTML='<div class="small">No badges yet — start completing challenges!</div>'; state.badges.forEach(b=>{const d=document.createElement('div');d.className='badge';d.textContent=b;badgesArea.appendChild(d)}); document.getElementById('level').textContent = Math.floor(state.points/50); document.getElementById('memberSince').textContent = 'Member since ' + (new Date(state.createdAt)).toLocaleDateString()}
+
+    function renderLeaderboardPreview(){leaderboardPreview.innerHTML=''; const combined=[...state.leaderboard]; const ix=combined.findIndex(x=>x.name===state.username); if(ix>=0) combined[ix].points = Math.max(combined[ix].points,state.points); else combined.push({name: state.username||'Guest', points: state.points}); combined.sort((a,b)=>b.points-a.points); combined.slice(0,5).forEach((r,idx)=>{const row=document.createElement('div');row.style.display='flex';row.style.justifyContent='space-between';row.style.padding='6px 0';row.innerHTML=`<div>${idx+1}. ${escapeHtml(r.name)}</div><div style="font-weight:700">${r.points} pts</div>`;leaderboardPreview.appendChild(row)})}
+
+    function renderTips(){tipsList.innerHTML=''; state.tips.forEach(t=>{const li=document.createElement('li');li.textContent=t;tipsList.appendChild(li)})}
+
+    function toggleComplete(id){const ch=state.challenges.find(c=>c.id===id); if(!ch) return; ch.completed = !ch.completed; if(ch.completed){state.points += ch.points; maybeBadges()} else state.points = Math.max(0, state.points - ch.points); render(); if(ch.completed) showModal('Completed', `<div>You completed <strong>${escapeHtml(ch.title)}</strong> and earned ${ch.points} points!</div><div style="margin-top:12px"><button id=shareNow>Share</button></div>`); setTimeout(()=>{const s=document.getElementById('shareNow'); if(s) s.onclick=()=>shareAchievement(ch)},60)}
+
+    function maybeBadges(){if(state.points>=50 && !state.badges.includes('Bronze Hero')) state.badges.push('Bronze Hero'); if(state.points>=150 && !state.badges.includes('Silver Steward')) state.badges.push('Silver Steward'); if(state.points>=300 && !state.badges.includes('Green Champion')) state.badges.push('Green Champion')}
+
+    document.getElementById('addBtn').onclick = ()=>{const title=document.getElementById('cTitle').value.trim(); const desc=document.getElementById('cDesc').value.trim(); const points=parseInt(document.getElementById('cPoints').value,10); if(!title){alert('Please add a title');return} const id='c'+Date.now(); state.challenges.unshift({id,title,desc,points,completed:false}); document.getElementById('cTitle').value=''; document.getElementById('cDesc').value=''; render()}
+
+    document.getElementById('resetBtn').onclick = ()=>{if(!confirm('Reset all app data?')) return; localStorage.removeItem(STORAGE_KEY); state = loadState(); render()}
+    document.getElementById('saveName').onclick = ()=>{const v=document.getElementById('username').value.trim()||'Guest'; state.username=v; saveState(); render()}
+
+    document.getElementById('openLeaderboard').onclick = ()=>{const combined=[...state.leaderboard]; const ix=combined.findIndex(x=>x.name===state.username); if(ix>=0) combined[ix].points = Math.max(combined[ix].points,state.points); else combined.push({name: state.username||'Guest', points: state.points}); combined.sort((a,b)=>b.points-a.points); const body=document.createElement('div'); body.innerHTML='<h4>Leaderboard</h4>'; combined.slice(0,20).forEach((r,idx)=>{const row=document.createElement('div');row.style.display='flex';row.style.justifyContent='space-between';row.style.padding='6px 0';row.innerHTML=`<div>${idx+1}. ${escapeHtml(r.name)}</div><div style="font-weight:700">${r.points} pts</div>`; body.appendChild(row)}); showModal('Leaderboard', body)}
+    document.getElementById('viewAllLB').onclick = ()=>document.getElementById('openLeaderboard').click()
+
+    document.getElementById('openReport').onclick = ()=>{const report=document.createElement('div');report.style.maxHeight='60vh';report.style.overflow='auto';report.innerHTML=`<h3>EcoHero — Brief Project Report</h3><p><strong>Intro:</strong> EcoHero encourages sustainable habits with micro-challenges, points, and badges.</p><h4>Features</h4><ul><li>Challenges list</li><li>Progress tracking</li><li>Points & badges</li><li>Responsive pastel UI</li></ul><h4>Gamification</h4><p>Small wins, visible progress, leaderboards, and badges sustain engagement.</p><h4>Next</h4><ol><li>Auth + backend for cross-device sync</li><li>Seasonal events</li><li>Social features</li></ol>`; showModal('Project Report', report)}
+
+    const modal = document.getElementById('modal'), modalTitle = document.getElementById('modalTitle'), modalBody = document.getElementById('modalBody'); document.getElementById('closeModal').onclick=()=>hideModal(); modal.onclick=(e)=>{ if(e.target===modal) hideModal() }
+    function showModal(title,content){modal.style.display='flex'; modalTitle.textContent=title; if(typeof content==='string') modalBody.innerHTML=content; else{modalBody.innerHTML=''; modalBody.appendChild(content)}}
+    function hideModal(){modal.style.display='none'}
+
+    function shareAchievement(ch){const text=`${state.username||'I'} completed "${ch.title}" on EcoHero and earned ${ch.points} points!`; if(navigator.share){navigator.share({title:'EcoHero achievement',text})}else{navigator.clipboard&&navigator.clipboard.writeText(text).then(()=>alert('Achievement copied to clipboard!'))}}
+    document.getElementById('shareBtn').onclick = ()=>{const text=`${state.username||'A user'} has ${state.points} points on EcoHero!`; if(navigator.share){navigator.share({title:'EcoHero progress',text})}else{navigator.clipboard&&navigator.clipboard.writeText(text).then(()=>alert('Progress copied to clipboard!'))}}
+
+    function escapeHtml(s){return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
+
+    render()
+  </script>
+</body>
+</html>
